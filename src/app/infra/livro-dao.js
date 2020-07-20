@@ -4,28 +4,29 @@ class LivroDao {
         this._db = db;
     }
 
-    adiciona(livro){
-        return new Promise((resolve, reject) =>{
+    adiciona(livro) {
+        return new Promise((resolve, reject) => {
             this._db.run(`
-                INSERT INTO LIVROS (
-                titulo,
-                preco,
-                descricao
-            ) values (?, ?, ?)
-            `,
-            [
-                livro.titulo,
-                livro.preco,
-                livro.descricao
-            ], 
-            function (err) {
-                if (err) {
-                    console.log(err);
-                    return reject('Não foi possível adicionar o livro!');
-                }
+                INSERT INTO livros (
+                    titulo, 
+                    preco,
+                    descricao
+                ) values (?,?,?)
+                `,
+                [
+                    livro.titulo,
+                    livro.preco,
+                    livro.descricao
+                ],
+                function (err) {
+                    if (err) {
+                        console.log(err);
+                        return reject('Não foi possível adicionar o livro!');
+                    }
 
-                resolve();
-            })
+                    resolve();
+                }
+            )
         });
     }
 
@@ -34,34 +35,32 @@ class LivroDao {
             this._db.all(
                 'SELECT * FROM livros',
                 (erro, resultados) => {
-                    if(erro){
-                        return reject('Não foi possivel listar os livros')
-                    }
+                    if (erro) return reject('Não foi possível listar os livros!');
 
-                    return resolve(resultados)
+                    return resolve(resultados);
                 }
-                
             )
-        })
-
+        });
     }
 
-    buscaPorId(id){
-        return new Promise((resolve, reject) =>{
-            this._db.get(`SELECT * FROM livros where id = ?`, [id]
-            , (erro, livro)=> {
-                if(erro){
-                    return reject('Não foi possivel achar o livro')
+    buscaPorId(id) {
+
+        return new Promise((resolve, reject) => {
+            this._db.get(
+                `
+                    SELECT *
+                    FROM livros
+                    WHERE id = ?
+                `,
+                [id],
+                (erro, livro) => {
+                    if (erro) {
+                        return reject('Não foi possível encontrar o livro!');
+                    }
+                    return resolve(livro);
                 }
-                // if (!livro || livro=== undefined){
-                //     console.log('passou aqui')
-                //     return reject('Não foi possivel achar o livro')
-                // }
-                return resolve(livro)
-            }
-            
-            )
-        })
+            );
+        });
     }
 
     atualiza(livro) {
@@ -92,7 +91,7 @@ class LivroDao {
     remove(id) {
 
         return new Promise((resolve, reject) => {
-            this._db.run(
+            this._db.get(
                 `
                     DELETE 
                     FROM livros
@@ -108,7 +107,6 @@ class LivroDao {
             );
         });
     }
-
 }
 
 module.exports = LivroDao;
